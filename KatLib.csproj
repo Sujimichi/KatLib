@@ -52,6 +52,7 @@
     <Compile Include="ComboBox.cs" />
     <Compile Include="DryUI.cs" />
     <Compile Include="DryUIDialog.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

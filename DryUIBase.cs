@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace KatLib
 {
-    //Base class used in KX GUIs.  Provides a set of helper methods for GUILayout calls. these helpers take lambda statements and wraps
+    //Base class used in GUIs.  Provides a set of helper methods for GUILayout calls. these helpers take lambda statements and wraps
     //them in calls to GUILayout methods.
     public class DryUIBase : MonoBehaviour
     {

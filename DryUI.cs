@@ -55,12 +55,12 @@ namespace KatLib
         public bool visible                 = true;     //sets if the window is visible to start with (see show(), hide(), toggle(), on_show(), on_hide())
         protected bool gui_locked           = false;    //if true will disable interaction with the window (without changing its appearance) (see lock_ui() and unlock_ui())
         protected int window_id             = 0;        //can be set to override automatic ID assignment. If left at 0 it will be auto-assigned
-        static int last_window_id           = 0;        //static track of the last used window ID, new windows will take the next value and increment this.
+        protected static int last_window_id = 0;        //static track of the last used window ID, new windows will take the next value and increment this.
         public string window_title          = "untitled window";    //shockingly enough, this is the window title
         //public Rect window_pos            = new Rect()            //override in Start() to set window size/pos - default values are defined in DryUIBase
 
 
-        private bool interface_locked       = false; //not to be confused with gui_locked. interface_lock is set to true when ControlLocks are set on the KSP interface
+        protected bool interface_locked       = false; //not to be confused with gui_locked. interface_lock is set to true when ControlLocks are set on the KSP interface
         protected bool is_dialog            = false; //set to true in dialog windows.
 
 
@@ -109,13 +109,6 @@ namespace KatLib
             gui_locked = false;
         }
 
-        //called after successful login IF the login was initiated from a DryUI with require_login set to true. 
-        //Windows which inherit from DryUI can override this method to have specific actions performed after login
-        //(ie: UploadInterface will request a fetch of existing craft).
-        protected virtual void on_login(){
-//            GameObject.Destroy(KerbalX.login_gui);
-        }
-
         //As windows will have been drawn with GUILayout.ExpandHeight(true) setting the height to a small value will cause the window to readjust its height.
         //Only call after actions which reduce the height of the content, don't call it constantly OnGUI (unless Epilepsy is something you enjoy)
         public void autoheight(){
@@ -140,13 +133,13 @@ namespace KatLib
         }
 
         //basically just syntax sugar for a call to AddOrGetComponent for specific named windows. (unfortunatly has nothing to do with launching rockets)
-        protected void launch(string type){
+//        protected void launch(string type){
 //            if(type == "ImageSelector"){
 //                gameObject.AddOrGetComponent<KerbalXImageSelector>();
 //            } else if(type == "ActionGroupEditor"){
 //                gameObject.AddOrGetComponent<KerbalXActionGroupInterface>();
 //            }
-        }
+//        }
 
         //prevents mouse actions on the GUI window from affecting things behind it.
         protected void prevent_ui_click_through(){
@@ -186,7 +179,7 @@ namespace KatLib
         }
 
         //Callback method which is passed to GUILayout.Window in OnGUI.  Calls WindowContent and performs common window actions
-        private void DrawWindow(int window_id){
+        protected virtual void DrawWindow(int window_id){
             if(prevent_click_through){
                 prevent_ui_click_through();
             }
@@ -218,13 +211,7 @@ namespace KatLib
 
         //Default Footer for all windows, can be overridden only called if footer==true
         protected virtual void FooterContent(int window_id){
-//            section(w =>{
-//                if(GUILayout.Button("KerbalX.com", "hyperlink.footer", width(75f), height(30f))){
-//                    Application.OpenURL(KerbalX.site_url);
-//                }
-//                GUILayout.FlexibleSpace();
-//                GUILayout.Label(StyleSheet.assets["logo_small"]);
-//            });
+        
         }
 
         protected virtual void OnDestroy(){
