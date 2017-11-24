@@ -13,6 +13,7 @@ namespace KatLib
     {
         public static DryDialog instance = null;
         public DialogContent content;
+        public bool click_out_closes = false;
 
         private void Start() {
             DryDialog.instance = this;
@@ -22,6 +23,13 @@ namespace KatLib
 
         protected override void WindowContent(int win_id) {            
             content(this);
+//            if(click_out_closes){
+//                Vector2 mp = Event.current.mousePosition;
+//                if( (mp.y < 0 || mp.y > window_pos.y) && (mp.x < 0 || mp.x > window_pos.x) ){
+//                    Debug.Log("outside");
+////                    close_dialog();
+//                }
+//            }
         }
 
         public static void close() {

@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 //using UnityEngine;
 
@@ -14,7 +14,7 @@ namespace KatLib
             return digest(str1) == digest(str2);
         }
 
-        internal static string digest(string text){
+        public static string digest(string text){
             if(String.IsNullOrEmpty(text))
                 return String.Empty;
 
@@ -84,6 +84,9 @@ namespace KatLib
                     objects.Add(String.Format("\"{0}\":{1}", entry.Key, JSONX.toJSON(t, arg)));
                 } else if(entry.Value is String){
                     objects.Add(String.Format("\"{0}\":\"{1}\"", entry.Key, entry.Value));
+                }else if(entry.Value is List<string>){
+                    List<string> list = (List<string>)entry.Value;
+                    objects.Add(String.Format("\"{0}\":[\"{1}\"]", entry.Key, String.Join("\",\"", list.ToArray()) ));
                 } else{ 
                     //mutha of asumptions: if it's not a string or dict then it's a numeric, cos seriously C#, you don't have a numeric class? You want me to test for each 
                     //numerical type individualy? yeah....I'm to lazy for that...oh Ruby...I miss you so.
@@ -107,7 +110,7 @@ namespace KatLib
                     }
                 }
                 json_string = json_string + obj;
-                if(obj != objects.Last()){
+                if(obj != (objects.Count==0 ? null : objects[objects.Count-1])){
                     json_string = json_string + ",";
                 }
             }

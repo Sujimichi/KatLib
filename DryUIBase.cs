@@ -25,23 +25,33 @@ namespace KatLib
         protected GUILayoutOption height(float h){
             return GUILayout.Height(h);
         }
+        protected void fspace(){
+            GUILayout.FlexibleSpace();
+        }
+
+        protected void label(string text){
+            GUILayout.Label(text);
+        }
+        protected void label(string text, GUIStyle style){
+            GUILayout.Label(text, style);
+        }
 
 
-        //Essential for any window which needs to make web requests.  If a window is going to trigger web requests then it needs to call this method on its Start() method
-        //The RequestHandler handles sending requests asynchronously (so delays in response time don't lag the interface).  In order to do that it uses Coroutines 
-        //which are inherited from MonoBehaviour (and therefore can't be triggered by the static methods in KerbalXAPI).
-//        protected void enable_request_handler(){
-//            if(RequestHandler.instance == null){
-//                KerbalX.log("starting web request handler");
-//                RequestHandler request_handler = gameObject.AddOrGetComponent<RequestHandler>();
-//                RequestHandler.instance = request_handler;
-//            }
-//        }
+        protected string humanize(float val){
+            return String.Format("{0:n}", Math.Round(val, 2));
+        }
 
+
+        protected void gui_state(bool condition, ContentNoArgs content){
+            GUI.enabled = condition;
+            content();
+            GUI.enabled = true;
+        }
 
         //Definition of delegate to be passed into the section, v_section and scroll methods
         protected delegate void Content(float width);
         protected delegate void ContentNoArgs();
+        protected delegate void RectEvents(Rect rect);
 
 
         /* section essentially wraps the actions of a delegate (lambda) in calls to BeginHorizontal and EndHorizontal
@@ -68,17 +78,44 @@ namespace KatLib
             content(win_width_without_padding());
             GUILayout.EndHorizontal();                  
         } 
+        protected void section(ContentNoArgs content){
+            GUILayout.BeginHorizontal(get_section_style()); 
+            content();
+            GUILayout.EndHorizontal();                  
+        }
         protected void section(float section_width, Content content){
             GUILayout.BeginHorizontal(get_section_style(), GUILayout.Width(section_width), GUILayout.MaxWidth(section_width)); 
             content(section_width);
             GUILayout.EndHorizontal();
         }
+        protected void section(float section_width, ContentNoArgs content){
+            GUILayout.BeginHorizontal(get_section_style(), GUILayout.Width(section_width), GUILayout.MaxWidth(section_width)); 
+            content();
+            GUILayout.EndHorizontal();
+        }
+        protected void section(float section_width, GUIStyle style, Content content){
+            GUILayout.BeginHorizontal(style, GUILayout.Width(section_width), GUILayout.MaxWidth(section_width)); 
+            content(section_width);
+            GUILayout.EndHorizontal();
+        }
+        protected void section(float section_width, GUIStyle style, Content content, RectEvents rect_events){
+            GUILayout.BeginHorizontal(style, GUILayout.Width(section_width), GUILayout.MaxWidth(section_width)); 
+            content(section_width);
+            GUILayout.EndHorizontal();
+            rect_events(GUILayoutUtility.GetLastRect());
+        }
+
 
 
         //Works in the just the same way as section() but wraps the lambda in Begin/End Vertical instead.
         protected void v_section(Content content){
             GUILayout.BeginVertical(get_section_style()); 
             content(win_width_without_padding());
+            GUILayout.EndVertical();
+        }
+        protected void v_section(ContentNoArgs content){
+            GUILayout.BeginVertical(get_section_style()); 
+            content();
             GUILayout.EndVertical();
         }
         protected void v_section(float section_width, Content content){
@@ -96,7 +133,7 @@ namespace KatLib
         //Essentially just the same as section() it wraps the call to the lamba in BeginScrollView/EndScrollView calls.
         //The Vector2 is also returned so it can be passed back in in the next pass of OnGUI
         protected Vector2 scroll(Vector2 scroll_pos, float scroll_width, float scroll_height, Content content){
-            scroll_pos = GUILayout.BeginScrollView(scroll_pos, get_section_style(), GUILayout.Width(scroll_width), GUILayout.MaxWidth(scroll_width), GUILayout.Height(scroll_height));
+            scroll_pos = GUILayout.BeginScrollView(scroll_pos, get_section_style(DryUI.skin.scrollView), GUILayout.Width(scroll_width), GUILayout.MaxWidth(scroll_width), GUILayout.Height(scroll_height));
             content(scroll_width);
             GUILayout.EndScrollView();
             return scroll_pos;
@@ -109,6 +146,13 @@ namespace KatLib
             style_override = null;
             return style;
         }
+
+        private GUIStyle get_section_style(GUIStyle default_style){
+            GUIStyle style = style_override == null ? default_style  : style_override;
+            style_override = null;
+            return style;
+        }
+
         //Get the window width minus horizontal padding and border (used in above section(), v_section() and scroll() methods when they're not supplied a width)
         private float win_width_without_padding(){
             return window_pos.width - GUI.skin.window.padding.horizontal - GUI.skin.window.border.horizontal;
@@ -137,6 +181,19 @@ namespace KatLib
                     gameObject.AddOrGetComponent<ComboBox>().open(combo_name, select_options, anchors[combo_name], h, win, resp);
                 }
             });     
+        }
+
+        protected void dropdown(string label, string menu_ref, Dictionary<string, string> menu, DryUI parent_window, float btn_width, MenuResponse callback){
+//            string menu_ref = label.ToLower().Replace("/","");
+            if(GUILayout.Button(label, width(btn_width))){
+                if(Dropdown.instance == null){
+                    gameObject.AddOrGetComponent<Dropdown>().open(anchors[menu_ref], parent_window, menu, btn_width, callback);
+                } else{
+                    Dropdown.instance.close_menu();
+                }
+            }
+            track_rect(menu_ref, GUILayoutUtility.GetLastRect());            
+
         }
 
         protected void track_rect(string name, Rect rect){

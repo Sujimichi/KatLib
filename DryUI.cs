@@ -45,7 +45,7 @@ namespace KatLib
     */
     public class DryUI : DryUIBase
     {
-        public static GUISkin skin        = null;  //static variable to hold the reference to the custom skin. First window created will set it up
+        public static GUISkin skin        = null;  //static variable to hold the reference to the custom skin.
 
         //Window Config variables. Change these in Start() in descendent classes.
         public bool prevent_click_through   = true;     //prevent clicks interacting with elements behind the window

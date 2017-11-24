@@ -77,7 +77,8 @@ namespace KatLib
             instance = this;
         }
 
-        public void open(string combo_name, Dictionary<int, string> select_options, Rect anchor, float height, DryUI parent_win, ComboResponse selection_callback){
+        public void open(string combo_name, Dictionary<int, string> select_options, Rect anchor, 
+            float height, DryUI parent_win, ComboResponse selection_callback){
             if(active_anchor != combo_name){
                 active_anchor = combo_name;
                 sel_options = select_options;
