@@ -170,8 +170,9 @@ namespace KatLib
 
             if(visible){
                 GUI.skin = skin;
+
                 window_pos = GUILayout.Window(
-                    window_id, window_pos, DrawWindow, window_title, 
+                    window_id, window_pos, DrawWindow, window_title,
                     GUILayout.Width(window_pos.width), GUILayout.MaxWidth(window_pos.width), GUILayout.ExpandHeight(true)
                 );
                 GUI.skin = null;

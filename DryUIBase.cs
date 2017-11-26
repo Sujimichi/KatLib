@@ -132,12 +132,17 @@ namespace KatLib
         //Very similar to section() and v_section(), but requires a Vector2 to track scroll position and two floats for width and height as well as the content lamnbda
         //Essentially just the same as section() it wraps the call to the lamba in BeginScrollView/EndScrollView calls.
         //The Vector2 is also returned so it can be passed back in in the next pass of OnGUI
-        protected Vector2 scroll(Vector2 scroll_pos, float scroll_width, float scroll_height, Content content){
-            scroll_pos = GUILayout.BeginScrollView(scroll_pos, get_section_style(DryUI.skin.scrollView), GUILayout.Width(scroll_width), GUILayout.MaxWidth(scroll_width), GUILayout.Height(scroll_height));
+        protected Vector2 scroll(Vector2 scroll_pos, float scroll_width, float scroll_height, Content content){            
+            return scroll(scroll_pos, get_section_style(DryUI.skin.scrollView), scroll_width, scroll_height, content);
+        }
+        protected Vector2 scroll(Vector2 scroll_pos, GUIStyle scroll_style, float scroll_width, float scroll_height, Content content){
+            scroll_pos = GUILayout.BeginScrollView(scroll_pos, scroll_style, GUILayout.Width(scroll_width), GUILayout.MaxWidth(scroll_width), GUILayout.Height(scroll_height));
             content(scroll_width);
             GUILayout.EndScrollView();
             return scroll_pos;
         }
+
+
 
         //Helper for above section(), v_section() and scroll() methods.  Returns a GUIStyle, either a default GUIStyle() or if section_override has been
         //set then it returns that.  It also sets section_override back to null 
@@ -184,16 +189,20 @@ namespace KatLib
         }
 
         protected void dropdown(string label, string menu_ref, Dictionary<string, string> menu, DryUI parent_window, float btn_width, MenuResponse callback){
+            dropdown(label, menu_ref, menu, parent_window, btn_width, "Button", "menu.background", "menu.item", callback);
+        }
+
+        protected void dropdown(string label, string menu_ref, Dictionary<string, string> menu, DryUI parent_window, 
+            float btn_width, GUIStyle button_style, GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback){
 //            string menu_ref = label.ToLower().Replace("/","");
-            if(GUILayout.Button(label, width(btn_width))){
+            if(GUILayout.Button(label, button_style, width(btn_width))){
                 if(Dropdown.instance == null){
-                    gameObject.AddOrGetComponent<Dropdown>().open(anchors[menu_ref], parent_window, menu, btn_width, callback);
+                    gameObject.AddOrGetComponent<Dropdown>().open(anchors[menu_ref], parent_window, menu, btn_width, menu_style, menu_item_style, callback);
                 } else{
                     Dropdown.instance.close_menu();
                 }
             }
             track_rect(menu_ref, GUILayoutUtility.GetLastRect());            
-
         }
 
         protected void track_rect(string name, Rect rect){
