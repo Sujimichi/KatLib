@@ -2,8 +2,51 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-
+using ExtensionMethods;
 //using UnityEngine;
+
+namespace ExtensionMethods
+{
+    public static class MyExtensionMethods
+    {
+        public static string time_ago(this DateTime date)
+        {
+            const int SECOND = 1;
+            const int MINUTE = 60 * SECOND;
+            const int HOUR = 60 * MINUTE;
+            const int DAY = 24 * HOUR;
+            const int MONTH = 30 * DAY;
+
+            var ts = new TimeSpan(DateTime.UtcNow.Ticks - date.Ticks);
+            double delta = Math.Abs(ts.TotalSeconds);
+
+            if (delta < 1 * MINUTE)
+                return ts.Seconds == 1 ? "one second ago" : ts.Seconds + " seconds ago";
+
+            if (delta < 2 * MINUTE)
+                return "a minute ago";
+
+            if (delta < 45 * MINUTE)
+                return ts.Minutes + " minutes ago";
+
+            if (delta < 90 * MINUTE)
+                return "an hour ago";
+
+            if (delta < 24 * HOUR)
+                return ts.Hours + " hours ago";
+
+            if (delta < 48 * HOUR)
+                return "yesterday";
+
+            if (delta < 30 * DAY)
+                return ts.Days + " days ago";
+            else
+            {
+                return "on " + date.ToString("yyyy/MM/dd");
+            }
+        }    
+    }
+}
 
 namespace KatLib
 {
@@ -11,7 +54,7 @@ namespace KatLib
     {
 
         public static bool compare(string str1, string str2){
-            return digest(str1) == digest(str2);
+            return digest(str1) == digest(str2);           
         }
 
         public static string digest(string text){
@@ -25,6 +68,7 @@ namespace KatLib
             }
         }
     }
+
 
     public class Paths
     {

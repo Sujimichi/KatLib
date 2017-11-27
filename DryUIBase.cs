@@ -5,6 +5,17 @@ using System.Collections.Generic;
 
 namespace KatLib
 {
+
+    public struct ClickEvent{
+        public bool single_click;
+        public bool double_click;
+//        public ClickEvent(){
+//            
+//        }
+    }
+
+
+
     //Base class used in GUIs.  Provides a set of helper methods for GUILayout calls. these helpers take lambda statements and wraps
     //them in calls to GUILayout methods.
     public class DryUIBase : MonoBehaviour
@@ -35,6 +46,29 @@ namespace KatLib
         protected void label(string text, GUIStyle style){
             GUILayout.Label(text, style);
         }
+        protected void label(string text, GUILayoutOption label_width){
+            GUILayout.Label(text, label_width);
+        }
+        protected void label(string text, GUIStyle style, float label_width){
+            GUILayout.Label(text, style, width(label_width));
+        }
+        protected void label(string text, GUIStyle style, GUILayoutOption label_width){
+            GUILayout.Label(text, style, label_width);
+        }
+
+        protected void button(string text, ContentNoArgs action){
+            if(GUILayout.Button(text)){action();}
+        }
+        protected void button(string text, GUIStyle style, ContentNoArgs action){
+            if(GUILayout.Button(text, style)){action();}
+        }
+        protected void button(string text, float button_width, ContentNoArgs action){
+            if(GUILayout.Button(text, width(button_width))){action();}
+        }
+        protected void button(string text, GUIStyle style, float button_width, ContentNoArgs action){
+            if(GUILayout.Button(text, style, width(button_width))){action();}
+        }
+
 
 
         protected string humanize(float val){
@@ -52,6 +86,7 @@ namespace KatLib
         protected delegate void Content(float width);
         protected delegate void ContentNoArgs();
         protected delegate void RectEvents(Rect rect);
+        protected delegate void ClickEvents(ClickEvent evt);
 
 
         /* section essentially wraps the actions of a delegate (lambda) in calls to BeginHorizontal and EndHorizontal
@@ -98,11 +133,26 @@ namespace KatLib
             content(section_width);
             GUILayout.EndHorizontal();
         }
-        protected void section(float section_width, GUIStyle style, Content content, RectEvents rect_events){
+
+        protected DateTime click_tracker = DateTime.Now;
+        protected void section(float section_width, GUIStyle style, Content content, ClickEvents click_event){
             GUILayout.BeginHorizontal(style, GUILayout.Width(section_width), GUILayout.MaxWidth(section_width)); 
             content(section_width);
             GUILayout.EndHorizontal();
-            rect_events(GUILayoutUtility.GetLastRect());
+            Rect container = GUILayoutUtility.GetLastRect();
+            if(container.Contains(Event.current.mousePosition) && Event.current.type == EventType.MouseDown && Event.current.button == 0){ 
+                double elapsed_seconds = (DateTime.Now - click_tracker).TotalSeconds;
+                Debug.Log(elapsed_seconds.ToString());
+                click_tracker = DateTime.Now;
+                ClickEvent evt = new ClickEvent();
+                if(elapsed_seconds < 0.5){
+                    evt.double_click = true;
+                }else{
+                    evt.single_click = true;
+                }
+                click_event(evt);                    
+                Event.current.Use();
+            }
         }
 
 
@@ -124,7 +174,9 @@ namespace KatLib
             GUILayout.EndVertical();
         }
         protected void v_section(float section_width, float section_height, Content content){
-            GUILayout.BeginVertical(get_section_style(), GUILayout.Width(section_width), GUILayout.MaxWidth(section_width), GUILayout.Height(section_height));
+            GUILayout.BeginVertical(get_section_style(), GUILayout.Width(section_width), GUILayout.MaxWidth(section_width), 
+                GUILayout.Height(section_height), GUILayout.MaxHeight(section_height)
+            );
             content(section_width);
             GUILayout.EndVertical();
         }
@@ -191,23 +243,32 @@ namespace KatLib
         protected void dropdown(string label, string menu_ref, Dictionary<string, string> menu, DryUI parent_window, float btn_width, MenuResponse callback){
             dropdown(label, menu_ref, menu, parent_window, btn_width, "Button", "menu.background", "menu.item", callback);
         }
+        protected void dropdown(string label, string menu_ref, Dictionary<string, string> menu, DryUI parent_window, Rect offset, float btn_width, MenuResponse callback){
+            dropdown(label, menu_ref, menu, parent_window, offset, btn_width, "Button", "menu.background", "menu.item", callback);
+        }
 
+        protected Rect default_offset = new Rect(0, 0, 0, 0);
         protected void dropdown(string label, string menu_ref, Dictionary<string, string> menu, DryUI parent_window, 
             float btn_width, GUIStyle button_style, GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback){
-//            string menu_ref = label.ToLower().Replace("/","");
+            dropdown(label, menu_ref, menu, parent_window, default_offset, btn_width, button_style, menu_style, menu_item_style, callback);
+        }
+
+        protected void dropdown(string label, string menu_ref, Dictionary<string, string> menu, DryUI parent_window, Rect offset,
+            float btn_width, GUIStyle button_style, GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback){
             if(GUILayout.Button(label, button_style, width(btn_width))){
                 if(Dropdown.instance == null){
-                    gameObject.AddOrGetComponent<Dropdown>().open(anchors[menu_ref], parent_window, menu, btn_width, menu_style, menu_item_style, callback);
+                    gameObject.AddOrGetComponent<Dropdown>().open(anchors[menu_ref], offset, parent_window, menu, btn_width, menu_style, menu_item_style, callback);
                 } else{
                     Dropdown.instance.close_menu();
                 }
             }
-            track_rect(menu_ref, GUILayoutUtility.GetLastRect());            
+            track_rect(menu_ref, GUILayoutUtility.GetLastRect(), true);            
         }
 
-        protected void track_rect(string name, Rect rect){
+
+        protected void track_rect(string name, Rect rect, bool always_track = false){
             if(rect.x != 0 && rect.y != 0){
-                if(!anchors.ContainsKey(name)){
+                if(!anchors.ContainsKey(name) || always_track){
                     anchors[name] = rect;
                 }
             }
