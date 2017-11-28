@@ -14,6 +14,7 @@ namespace KatLib
         public static DryDialog instance = null;
         public DialogContent content;
         public bool click_out_closes = false;
+        public int gui_depth = 0;
 
         private void Start() {
             DryDialog.instance = this;
@@ -22,6 +23,7 @@ namespace KatLib
         }
 
         protected override void WindowContent(int win_id) {            
+            GUI.depth = gui_depth;
             content(this);
 
 //            if(click_out_closes){

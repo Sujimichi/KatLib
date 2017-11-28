@@ -57,6 +57,7 @@ namespace KatLib
         protected int window_id             = 0;        //can be set to override automatic ID assignment. If left at 0 it will be auto-assigned
         protected static int last_window_id = 0;        //static track of the last used window ID, new windows will take the next value and increment this.
         public string window_title          = "untitled window";    //shockingly enough, this is the window title
+        public bool modal                   = false;
         //public Rect window_pos            = new Rect()            //override in Start() to set window size/pos - default values are defined in DryUIBase
 
 
@@ -170,11 +171,16 @@ namespace KatLib
 
             if(visible){
                 GUI.skin = skin;
-
-                window_pos = GUILayout.Window(
-                    window_id, window_pos, DrawWindow, window_title,
-                    GUILayout.Width(window_pos.width), GUILayout.MaxWidth(window_pos.width), GUILayout.ExpandHeight(true)
-                );
+                if(modal){
+                    window_pos = GUI.ModalWindow(
+                        window_id, window_pos, DrawWindow, window_title
+                    );
+                } else{                    
+                    window_pos = GUILayout.Window(
+                        window_id, window_pos, DrawWindow, window_title,
+                        GUILayout.Width(window_pos.width), GUILayout.MaxWidth(window_pos.width), GUILayout.ExpandHeight(true)
+                    );
+                }
                 GUI.skin = null;
             }
         }

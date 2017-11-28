@@ -142,7 +142,6 @@ namespace KatLib
             Rect container = GUILayoutUtility.GetLastRect();
             if(container.Contains(Event.current.mousePosition) && Event.current.type == EventType.MouseDown && Event.current.button == 0){ 
                 double elapsed_seconds = (DateTime.Now - click_tracker).TotalSeconds;
-                Debug.Log(elapsed_seconds.ToString());
                 click_tracker = DateTime.Now;
                 ClickEvent evt = new ClickEvent();
                 if(elapsed_seconds < 0.5){
@@ -150,7 +149,7 @@ namespace KatLib
                 }else{
                     evt.single_click = true;
                 }
-                click_event(evt);                    
+                click_event(evt);
                 Event.current.Use();
             }
         }
