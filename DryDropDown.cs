@@ -19,7 +19,13 @@ namespace KatLib
         public Rect anchor_offset;
         public DryUI parent_window;
         public int gui_depth = 0;
-        public Dictionary<string, string> menu_content;
+
+        public Dictionary<string, string> menu_content_dict;
+        public List<string> menu_content_list;
+
+        public List<string> menu_values;
+        public string mode = "dict";
+
         public MenuResponse resp;
         public float menu_width = 80;
         public float menu_min_width = 80;
@@ -30,22 +36,33 @@ namespace KatLib
         public float scroll_width;
 
 
-        public void open(Rect anchor, Rect offset, DryUI window, Dictionary<string, string> list, float width, GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback){
+        public void open(Rect anchor, Rect offset, DryUI window, object menu_data, float width, GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback){
             anchor_rec = anchor;
             anchor_offset = offset;
             parent_window = window;
-            menu_content = list;
+            if(menu_data is Dictionary<string, string>){
+                menu_content_dict = (Dictionary<string, string>)menu_data;
+                menu_values = new List<string>(menu_content_dict.Values);
+                mode = "dict";
+            }else if(menu_data is List<string>){
+                menu_content_list = (List<string>)menu_data;
+                menu_values = menu_content_list;
+                mode = "list";
+            } else{                
+                menu_content_list = new List<string> { "menu not correctly setup" };
+                menu_values = menu_content_list;
+                mode = "list";
+            }
             style_menu = menu_style;
             style_menu_item = menu_item_style;
 
-            foreach(KeyValuePair<string, string> pair in list){
-                float w = menu_item_style.CalcSize(new GUIContent(pair.Value)).x + 15;
-//                float w = GUI.skin.button.CalcSize(new GUIContent(pair.Value)).x + 15;
+            foreach(string val in menu_values){
+                float w = menu_item_style.CalcSize(new GUIContent(val)).x + 15;
                 if(w > menu_width){menu_width = w;}
             }
 
             container.width = menu_width+15;
-            container.height = list.Count * (menu_item_style.CalcSize(new GUIContent("jeb")).y + 5)+10;
+            container.height = menu_values.Count * (menu_item_style.CalcSize(new GUIContent("jeb")).y + 5)+10;
             scroll_width = menu_width+6;
             if(container.height > scroll_height){
                 scroll_width += 22;
@@ -92,11 +109,21 @@ namespace KatLib
                     style_override = style_menu;
                     v_section(menu_width, w => {
                         GUILayout.Space(2);
-                        foreach(KeyValuePair<string, string> pair in menu_content){
-                            if(GUILayout.Button(pair.Value, style_menu_item)){
-                                resp(pair.Key);
-                                close_menu();
-                            }
+                        if(mode == "dict"){
+                            foreach(KeyValuePair<string, string> pair in menu_content_dict){
+                                if(GUILayout.Button(pair.Value, style_menu_item)){
+                                    resp(pair.Key);
+                                    close_menu();
+                                }
+                            }                            
+                        }else if(mode == "list"){
+                            foreach(string val in menu_content_list){
+                                if(GUILayout.Button(val, style_menu_item)){
+                                    resp(val);
+                                    close_menu();
+                                }
+                            }                            
+
                         }
                     });
                     

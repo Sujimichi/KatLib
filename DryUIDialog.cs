@@ -12,6 +12,7 @@ namespace KatLib
     public class DryDialog : DryUI
     {
         public static DryDialog instance = null;
+
         public DialogContent content;
         public bool click_out_closes = false;
         public int gui_depth = 0;

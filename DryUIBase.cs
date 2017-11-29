@@ -239,20 +239,23 @@ namespace KatLib
             });     
         }
 
-        protected void dropdown(string label, string menu_ref, Dictionary<string, string> menu, DryUI parent_window, float btn_width, MenuResponse callback){
+        protected void dropdown(string label, string menu_ref, object menu, DryUI parent_window, float btn_width, MenuResponse callback){
             dropdown(label, menu_ref, menu, parent_window, btn_width, "Button", "menu.background", "menu.item", callback);
         }
-        protected void dropdown(string label, string menu_ref, Dictionary<string, string> menu, DryUI parent_window, Rect offset, float btn_width, MenuResponse callback){
+        protected void dropdown(string label, string menu_ref, object menu, DryUI parent_window, float btn_width, GUIStyle button_style, MenuResponse callback){
+            dropdown(label, menu_ref, menu, parent_window, btn_width, button_style, "menu.background", "menu.item", callback);
+        }
+        protected void dropdown(string label, string menu_ref, object menu, DryUI parent_window, Rect offset, float btn_width, MenuResponse callback){
             dropdown(label, menu_ref, menu, parent_window, offset, btn_width, "Button", "menu.background", "menu.item", callback);
         }
 
         protected Rect default_offset = new Rect(0, 0, 0, 0);
-        protected void dropdown(string label, string menu_ref, Dictionary<string, string> menu, DryUI parent_window, 
+        protected void dropdown(string label, string menu_ref, object menu, DryUI parent_window, 
             float btn_width, GUIStyle button_style, GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback){
             dropdown(label, menu_ref, menu, parent_window, default_offset, btn_width, button_style, menu_style, menu_item_style, callback);
         }
 
-        protected void dropdown(string label, string menu_ref, Dictionary<string, string> menu, DryUI parent_window, Rect offset,
+        protected void dropdown(string label, string menu_ref, object menu, DryUI parent_window, Rect offset,
             float btn_width, GUIStyle button_style, GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback){
             if(GUILayout.Button(label, button_style, width(btn_width))){
                 if(Dropdown.instance == null){
