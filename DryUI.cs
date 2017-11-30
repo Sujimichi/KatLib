@@ -50,16 +50,15 @@ namespace KatLib
         //Window Config variables. Change these in Start() in descendent classes.
         public bool prevent_click_through   = true;     //prevent clicks interacting with elements behind the window
         protected bool require_login        = false;    //set to true if the window requires user to be logged into KerbalX
-        protected bool draggable            = true;     //sets the window as draggable
+        public bool draggable               = true;     //sets the window as draggable
         public bool footer                  = true;     //sets if the set footer content should be draw (see FooterContent method)
         public bool visible                 = true;     //sets if the window is visible to start with (see show(), hide(), toggle(), on_show(), on_hide())
         protected bool gui_locked           = false;    //if true will disable interaction with the window (without changing its appearance) (see lock_ui() and unlock_ui())
         protected int window_id             = 0;        //can be set to override automatic ID assignment. If left at 0 it will be auto-assigned
         protected static int last_window_id = 0;        //static track of the last used window ID, new windows will take the next value and increment this.
         public string window_title          = "untitled window";    //shockingly enough, this is the window title
-        public bool modal                   = false;
         //public Rect window_pos            = new Rect()            //override in Start() to set window size/pos - default values are defined in DryUIBase
-
+//        public int gui_depth                = 0;
 
         protected bool interface_locked       = false; //not to be confused with gui_locked. interface_lock is set to true when ControlLocks are set on the KSP interface
         protected bool is_dialog            = false; //set to true in dialog windows.
@@ -163,7 +162,7 @@ namespace KatLib
         //MonoBehaviour methods
 
         //called on each frame, handles drawing the window and will assign the next window id if it's not set
-        protected void OnGUI(){
+        protected virtual void OnGUI(){
             if(window_id == 0){
                 window_id = last_window_id + 1;
                 last_window_id = last_window_id + 1;
@@ -171,16 +170,10 @@ namespace KatLib
 
             if(visible){
                 GUI.skin = skin;
-                if(modal){
-                    window_pos = GUI.ModalWindow(
-                        window_id, window_pos, DrawWindow, window_title
-                    );
-                } else{                    
-                    window_pos = GUILayout.Window(
-                        window_id, window_pos, DrawWindow, window_title,
-                        GUILayout.Width(window_pos.width), GUILayout.MaxWidth(window_pos.width), GUILayout.ExpandHeight(true)
-                    );
-                }
+                window_pos = GUILayout.Window(
+                    window_id, window_pos, DrawWindow, window_title,
+                    GUILayout.Width(window_pos.width), GUILayout.MaxWidth(window_pos.width), GUILayout.ExpandHeight(true)
+                );
                 GUI.skin = null;
             }
         }

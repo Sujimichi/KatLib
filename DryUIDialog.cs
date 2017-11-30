@@ -21,19 +21,13 @@ namespace KatLib
             DryDialog.instance = this;
             footer = false;
             is_dialog = true;
+            draggable = false;
         }
+
 
         protected override void WindowContent(int win_id) {            
             GUI.depth = gui_depth;
             content(this);
-
-//            if(click_out_closes){
-//                Vector2 mp = Event.current.mousePosition;
-//                if( (mp.y < 0 || mp.y > window_pos.y) && (mp.x < 0 || mp.x > window_pos.x) ){
-//                    Debug.Log("outside");
-////                    close_dialog();
-//                }
-//            }
         }
 
         public static void close() {
@@ -42,5 +36,47 @@ namespace KatLib
             }
         }
     }
+
+    public class ModalDialog : DryDialog
+    {
+
+        new public Rect window_pos = new Rect(0, 0, Screen.width, Screen.height);
+
+        public Rect dialog_pos = new Rect(0,0,500,80);
+        public Rect title_pos = new Rect();
+
+        protected override void OnGUI(){
+            if(window_id == 0){
+                window_id = last_window_id + 1;
+                last_window_id = last_window_id + 1;
+            }
+
+            if(visible){
+                GUI.skin = skin;
+                window_pos = GUI.ModalWindow(
+                    window_id, window_pos, DrawWindow, "", skin.box
+                );
+                GUI.skin = null;
+            }
+
+        }
+
+        protected override void WindowContent(int win_id){
+            GUI.depth = gui_depth;
+            GUILayout.Space(dialog_pos.y);
+            title_pos = dialog_pos;
+            title_pos.height = 20;
+            section(() =>{
+                GUILayout.Space(dialog_pos.x);
+                GUILayout.BeginVertical("Window", width(dialog_pos.width), height(80f), GUILayout.ExpandHeight(true));
+                GUI.Label(title_pos, window_title, "modal.title");
+                content(this);
+                GUILayout.EndVertical();
+            });
+        }
+
+
+    }
+
 }
 
