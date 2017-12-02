@@ -128,6 +128,12 @@ namespace KatLib
             content();
             GUILayout.EndHorizontal();
         }
+        protected void section(float section_width, float section_height, ContentNoArgs content){
+            GUILayout.BeginHorizontal(get_section_style(), GUILayout.Width(section_width), GUILayout.MaxWidth(section_width), 
+                GUILayout.Height(section_height), GUILayout.MaxHeight(section_height)); 
+            content();
+            GUILayout.EndHorizontal();
+        }
         protected void section(float section_width, GUIStyle style, Content content){
             GUILayout.BeginHorizontal(style, GUILayout.Width(section_width), GUILayout.MaxWidth(section_width)); 
             content(section_width);
@@ -135,6 +141,7 @@ namespace KatLib
         }
 
         protected DateTime click_tracker = DateTime.Now;
+        protected Rect last_click_target;
         protected void section(float section_width, GUIStyle style, Content content, ClickEvents click_event){
             GUILayout.BeginHorizontal(style, GUILayout.Width(section_width), GUILayout.MaxWidth(section_width)); 
             content(section_width);
@@ -144,11 +151,12 @@ namespace KatLib
                 double elapsed_seconds = (DateTime.Now - click_tracker).TotalSeconds;
                 click_tracker = DateTime.Now;
                 ClickEvent evt = new ClickEvent();
-                if(elapsed_seconds < 0.5){
+                if(elapsed_seconds < 0.5 && last_click_target == container){
                     evt.double_click = true;
                 }else{
                     evt.single_click = true;
                 }
+                last_click_target = container;
                 click_event(evt);
                 Event.current.Use();
             }
@@ -169,6 +177,11 @@ namespace KatLib
         }
         protected void v_section(float section_width, Content content){
             GUILayout.BeginVertical(get_section_style(), GUILayout.Width(section_width), GUILayout.MaxWidth(section_width));
+            content(section_width);
+            GUILayout.EndVertical();
+        }
+        protected void v_section(float section_width, GUIStyle style, Content content){
+            GUILayout.BeginVertical(style, GUILayout.Width(section_width), GUILayout.MaxWidth(section_width));
             content(section_width);
             GUILayout.EndVertical();
         }
