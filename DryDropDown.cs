@@ -8,12 +8,12 @@ namespace KatLib
 {
     public delegate void MenuResponse(string selected);
 
-    public class Dropdown:DryUIBase
+    public class Dropdown : DryUIBase
     {
 
         public static Dropdown instance = null;
 
-
+        public GUISkin skin = null;
         public Rect container = new Rect(0, 0, 0, 0);
         public Rect anchor_rec;
         public Rect anchor_offset;
@@ -40,6 +40,7 @@ namespace KatLib
             anchor_rec = anchor;
             anchor_offset = offset;
             parent_window = window;
+            skin = parent_window.skin;
             if(menu_data is Dictionary<string, string>){
                 menu_content_dict = (Dictionary<string, string>)menu_data;
                 menu_values = new List<string>(menu_content_dict.Values);
@@ -98,7 +99,7 @@ namespace KatLib
         }
 
         void OnGUI(){
-            GUI.skin = DryUI.skin;
+            GUI.skin = skin;
             GUI.depth = gui_depth;
 
             container.x = anchor_rec.x + parent_window.window_pos.x + anchor_rec.width - menu_width;

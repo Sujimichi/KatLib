@@ -60,6 +60,7 @@ namespace KatLib
     {
         public static ComboBox instance;
 
+        public GUISkin skin = null;
         public string active_anchor = null;
         public Rect anchor_rect = new Rect(0, 0, 100, 100);
         public Rect container = new Rect(0, 0, 100, 100);
@@ -85,6 +86,7 @@ namespace KatLib
                 response = selection_callback;
                 anchor_rect = anchor;
                 parent_window = parent_win;
+                skin = parent_window.skin;
                 list_height = height;
             }
         }
@@ -103,7 +105,7 @@ namespace KatLib
             container.width = anchor_rect.width + 26f; //the 26 accouts for the 20f wide button + 3f padding either side of it.
             container.height = list_height;
 
-            GUI.skin = DryUI.skin;
+            GUI.skin = skin;
             GUI.depth = gui_depth;
 
             //If the mouse is NOT over the combobox and its list AND the user clicks, the close the combobox.  Otherwise set the parent window to be locked (GUI.enabled = false)

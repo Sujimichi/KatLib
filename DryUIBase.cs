@@ -197,7 +197,7 @@ namespace KatLib
         //Essentially just the same as section() it wraps the call to the lamba in BeginScrollView/EndScrollView calls.
         //The Vector2 is also returned so it can be passed back in in the next pass of OnGUI
         protected Vector2 scroll(Vector2 scroll_pos, float scroll_width, float scroll_height, Content content){            
-            return scroll(scroll_pos, get_section_style(DryUI.skin.scrollView), scroll_width, scroll_height, content);
+            return scroll(scroll_pos, get_section_style(GUI.skin.scrollView), scroll_width, scroll_height, content);
         }
         protected Vector2 scroll(Vector2 scroll_pos, GUIStyle scroll_style, float scroll_width, float scroll_height, Content content){
             scroll_pos = GUILayout.BeginScrollView(scroll_pos, scroll_style, 
@@ -242,7 +242,9 @@ namespace KatLib
         }
 
         //Uses the ComboBox class to setup a drop down menu.
-        protected void combobox(string combo_name, Dictionary<int, string> select_options, int selected_id, float list_width, float list_height, DryUI win, ComboResponse resp){
+        protected void combobox(string combo_name, Dictionary<int, string> select_options, 
+            int selected_id, float list_width, float list_height, DryUI win, ComboResponse resp
+        ){
             section(list_width, w =>{
                 float h = 22f + select_options.Count * 17;
                 if(h > list_height){

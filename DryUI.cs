@@ -45,7 +45,7 @@ namespace KatLib
     */
     public class DryUI : DryUIBase
     {
-        public static GUISkin skin        = null;  //static variable to hold the reference to the custom skin.
+        public GUISkin skin        = null;  //static variable to hold the reference to the custom skin.
 
         //Window Config variables. Change these in Start() in descendent classes.
         public bool prevent_click_through   = true;     //prevent clicks interacting with elements behind the window
@@ -124,6 +124,7 @@ namespace KatLib
         protected DryDialog show_dialog(DialogContent content){
             DryDialog dialog = gameObject.AddOrGetComponent<DryDialog>();
             dialog.content = content;
+            dialog.skin = this.skin;
             return dialog;
         }
 
@@ -132,14 +133,6 @@ namespace KatLib
             DryDialog.close();      
         }
 
-        //basically just syntax sugar for a call to AddOrGetComponent for specific named windows. (unfortunatly has nothing to do with launching rockets)
-//        protected void launch(string type){
-//            if(type == "ImageSelector"){
-//                gameObject.AddOrGetComponent<KerbalXImageSelector>();
-//            } else if(type == "ActionGroupEditor"){
-//                gameObject.AddOrGetComponent<KerbalXActionGroupInterface>();
-//            }
-//        }
 
         //prevents mouse actions on the GUI window from affecting things behind it.
         protected void prevent_ui_click_through(){
@@ -169,12 +162,12 @@ namespace KatLib
             }
 
             if(visible){
-                GUI.skin = skin;
+//                GUI.skin = skin;
                 window_pos = GUILayout.Window(
                     window_id, window_pos, DrawWindow, window_title,
                     GUILayout.Width(window_pos.width), GUILayout.MaxWidth(window_pos.width), GUILayout.ExpandHeight(true)
                 );
-                GUI.skin = null;
+//                GUI.skin = null;
             }
         }
 

@@ -24,6 +24,11 @@ namespace KatLib
             draggable = false;
         }
 
+        protected override void OnGUI(){
+            GUI.skin = skin;
+            base.OnGUI();
+            GUI.skin = null;
+        }
 
         protected override void WindowContent(int win_id) {            
             GUI.depth = gui_depth;
