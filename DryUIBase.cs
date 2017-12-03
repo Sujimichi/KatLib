@@ -200,7 +200,9 @@ namespace KatLib
             return scroll(scroll_pos, get_section_style(DryUI.skin.scrollView), scroll_width, scroll_height, content);
         }
         protected Vector2 scroll(Vector2 scroll_pos, GUIStyle scroll_style, float scroll_width, float scroll_height, Content content){
-            scroll_pos = GUILayout.BeginScrollView(scroll_pos, scroll_style, GUILayout.Width(scroll_width), GUILayout.MaxWidth(scroll_width), GUILayout.Height(scroll_height));
+            scroll_pos = GUILayout.BeginScrollView(scroll_pos, scroll_style, 
+                GUILayout.Width(scroll_width), GUILayout.MaxWidth(scroll_width), GUILayout.Height(scroll_height)
+            );
             content(scroll_width);
             GUILayout.EndScrollView();
             return scroll_pos;
@@ -233,7 +235,11 @@ namespace KatLib
             content();
             GUI.EndGroup();
         }
-
+        protected void begin_group(Rect container, GUIStyle group_style, ContentNoArgs content){
+            GUI.BeginGroup(container, group_style);
+            content();
+            GUI.EndGroup();
+        }
 
         //Uses the ComboBox class to setup a drop down menu.
         protected void combobox(string combo_name, Dictionary<int, string> select_options, int selected_id, float list_width, float list_height, DryUI win, ComboResponse resp){

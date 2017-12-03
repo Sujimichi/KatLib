@@ -61,12 +61,22 @@ namespace KatLib
                 if(w > menu_width){menu_width = w;}
             }
 
-            container.width = menu_width+15;
-            container.height = menu_values.Count * (menu_item_style.CalcSize(new GUIContent("jeb")).y + 5)+10;
+            container.height = 10;
+            Vector2 val_size;
+            foreach(string val in menu_values){
+                val_size = menu_item_style.CalcSize(new GUIContent(val));
+//                val_size = DryUI.skin.GetStyle("menu.item").CalcSize(new GUIContent(val));
+                float w = val_size.x + 15;
+                container.height += val_size.y + 4;
+                if(w > menu_width){menu_width = w;}
+            }
+
+            container.width = menu_width+5;
+//            container.height = menu_values.Count * (menu_item_style.CalcSize(new GUIContent("jeb")).y + 4)+10;
             scroll_width = menu_width+6;
-            if(container.height > scroll_height){
+            if(container.height+5 > scroll_height){
                 scroll_width += 22;
-                container.width += 10;
+                container.width += 22;
             }
 
             resp = callback;
@@ -103,7 +113,7 @@ namespace KatLib
                 parent_window.lock_ui();
             }
 
-            begin_group(container, () =>{
+            begin_group(container, "menu.container", () =>{
                 
                 scroll_pos = scroll(scroll_pos, "menu.scroll", scroll_width, scroll_height, (scroll_inner_width) => {                    
                     style_override = style_menu;
