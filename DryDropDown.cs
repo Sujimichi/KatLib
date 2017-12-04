@@ -26,6 +26,7 @@ namespace KatLib
         public List<string> menu_values;
         public string mode = "dict";
 
+        public List<string> selected_items;
         public MenuResponse resp;
         public float menu_width = 80;
         public float menu_min_width = 80;
@@ -36,10 +37,17 @@ namespace KatLib
         public float scroll_width;
 
 
-        public void open(Rect anchor, Rect offset, DryUI window, object menu_data, float width, GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback){
+        public void open(Rect anchor, Rect offset, DryUI window, object menu_data, object selected, float width, 
+            GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback
+        ){
             anchor_rec = anchor;
             anchor_offset = offset;
             parent_window = window;
+            if(selected is string){
+                selected_items = new List<string>{ (string)selected };
+            } else{
+                selected_items = (List<string>)selected;
+            }
             skin = parent_window.skin;
             if(menu_data is Dictionary<string, string>){
                 menu_content_dict = (Dictionary<string, string>)menu_data;
@@ -122,14 +130,26 @@ namespace KatLib
                         GUILayout.Space(2);
                         if(mode == "dict"){
                             foreach(KeyValuePair<string, string> pair in menu_content_dict){
-                                if(GUILayout.Button(pair.Value, style_menu_item)){
+                                GUIStyle item_style = style_menu_item;
+                                if(selected_items != null){                                    
+                                    if(selected_items.Contains(pair.Key)){     
+                                        item_style = item_style.name + ".selected";
+                                    }
+                                }
+                                if(GUILayout.Button(pair.Value, item_style)){
                                     resp(pair.Key);
                                     close_menu();
                                 }
                             }                            
                         }else if(mode == "list"){
                             foreach(string val in menu_content_list){
-                                if(GUILayout.Button(val, style_menu_item)){
+                                GUIStyle item_style = style_menu_item;
+                                if(selected_items != null){
+                                    if(selected_items.Contains(val)){
+                                        item_style = item_style.name + ".selected";
+                                    }
+                                }
+                                if(GUILayout.Button(val, item_style)){
                                     resp(val);
                                     close_menu();
                                 }
