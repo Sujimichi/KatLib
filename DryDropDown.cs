@@ -7,6 +7,65 @@ using UnityEngine;
 namespace KatLib
 {
     public delegate void MenuResponse(string selected);
+    public delegate List<string> DataSource();
+
+
+    public class DropdownMenuData
+    {
+        public DropdownMenuData(){
+            
+        }
+        public DropdownMenuData(Dictionary<string, string> data){
+            items = data;
+        }
+        public DropdownMenuData(List<string> data){
+            set_data(data);
+        }
+
+
+        public Dictionary<string, string> items = new Dictionary<string, string>();
+        public List<string> selected_items = new List<string>();
+        public Dictionary<string, string> special_items = new Dictionary<string, string>();
+        public string selected_item = null;
+        public DataSource remote_data = null; //remote_data enables the menu to pull it's content at the monent it is opened 
+
+        public void set_data(List<string> data){
+            items.Clear();
+            foreach(string val in data){
+                items.Add(val, val);
+            }
+        }
+
+        public void set_data(Dictionary<string, string> data){
+            items.Clear();
+            items = data;
+        }
+
+        public void fetch_data(){
+            if(remote_data != null){
+                set_data(remote_data());
+            }
+        }
+
+        public List<string> values{ 
+            get { 
+                return new List<string>(items.Values);
+            }
+        }
+
+        public bool is_selected(string val){
+            bool sel = false;
+            if(selected_item != null){
+                sel = selected_item == val;
+            }
+            if(selected_items.Contains(val)){
+                sel = true;
+            }
+            return sel;
+        }
+
+
+    }
 
     public class Dropdown : DryUIBase
     {
@@ -20,73 +79,61 @@ namespace KatLib
         public DryUI parent_window;
         public int gui_depth = 0;
 
-        public Dictionary<string, string> menu_content_dict;
-        public List<string> menu_content_list;
-
-        public List<string> menu_values;
-        public string mode = "dict";
-
+        public DropdownMenuData menu_content;
         public List<string> selected_items;
+
         public MenuResponse resp;
         public float menu_width = 80;
         public float menu_min_width = 80;
         public GUIStyle style_menu = "menu.background";
         public GUIStyle style_menu_item = "menu.item";
+        public GUIStyle item_style;
         public Vector2 scroll_pos = new Vector2();
         public float scroll_height = 350f;
         public float scroll_width;
 
 
-        public void open(Rect anchor, Rect offset, DryUI window, object menu_data, object selected, float width, 
+        public void open(Rect anchor, Rect offset, DryUI window, DropdownMenuData menu_data, float width, 
             GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback
         ){
             anchor_rec = anchor;
             anchor_offset = offset;
             parent_window = window;
-            if(selected is string){
-                selected_items = new List<string>{ (string)selected };
-            } else{
-                selected_items = (List<string>)selected;
-            }
             skin = parent_window.skin;
-            if(menu_data is Dictionary<string, string>){
-                menu_content_dict = (Dictionary<string, string>)menu_data;
-                menu_values = new List<string>(menu_content_dict.Values);
-                mode = "dict";
-            }else if(menu_data is List<string>){
-                menu_content_list = (List<string>)menu_data;
-                menu_values = menu_content_list;
-                mode = "list";
-            } else{                
-                menu_content_list = new List<string> { "menu not correctly setup" };
-                menu_values = menu_content_list;
-                mode = "list";
-            }
+
+            menu_content = (DropdownMenuData)menu_data;
+            menu_content.fetch_data();
+
             style_menu = menu_style;
             style_menu_item = menu_item_style;
 
-            foreach(string val in menu_values){
+            foreach(string val in menu_content.values){
                 float w = menu_item_style.CalcSize(new GUIContent(val)).x + 15;
                 if(w > menu_width){menu_width = w;}
             }
 
             container.height = 10;
             Vector2 val_size;
-            foreach(string val in menu_values){
+
+            List<string> vals = new List<string>(menu_content.values);
+            foreach(KeyValuePair<string, string> pair in menu_content.special_items){
+                vals.Add(pair.Value);
+            }
+
+            foreach(string val in vals){
                 val_size = menu_item_style.CalcSize(new GUIContent(val));
-//                val_size = DryUI.skin.GetStyle("menu.item").CalcSize(new GUIContent(val));
                 float w = val_size.x + 15;
                 container.height += val_size.y + 4;
                 if(w > menu_width){menu_width = w;}
-            }
+            }               
 
             container.width = menu_width+5;
-//            container.height = menu_values.Count * (menu_item_style.CalcSize(new GUIContent("jeb")).y + 4)+10;
             scroll_width = menu_width+6;
             if(container.height+5 > scroll_height){
                 scroll_width += 22;
                 container.width += 22;
             }
+
 
             resp = callback;
         }
@@ -128,33 +175,24 @@ namespace KatLib
                     style_override = style_menu;
                     v_section(menu_width, w => {
                         GUILayout.Space(2);
-                        if(mode == "dict"){
-                            foreach(KeyValuePair<string, string> pair in menu_content_dict){
-                                GUIStyle item_style = style_menu_item;
-                                if(selected_items != null){                                    
-                                    if(selected_items.Contains(pair.Key)){     
-                                        item_style = item_style.name + ".selected";
-                                    }
-                                }
-                                if(GUILayout.Button(pair.Value, item_style)){
+                        if(menu_content.special_items.Count > 0){                            
+                            foreach(KeyValuePair<string, string> pair in menu_content.special_items){
+                                if(GUILayout.Button(pair.Value, style_menu_item.name + ".special")){
                                     resp(pair.Key);
                                     close_menu();
                                 }
-                            }                            
-                        }else if(mode == "list"){
-                            foreach(string val in menu_content_list){
-                                GUIStyle item_style = style_menu_item;
-                                if(selected_items != null){
-                                    if(selected_items.Contains(val)){
-                                        item_style = item_style.name + ".selected";
-                                    }
-                                }
-                                if(GUILayout.Button(val, item_style)){
-                                    resp(val);
-                                    close_menu();
-                                }
-                            }                            
+                            }
+                        }
 
+                        foreach(KeyValuePair<string, string> pair in menu_content.items){
+                            item_style = style_menu_item;
+                            if(menu_content.is_selected(pair.Key)){
+                                item_style = item_style.name + ".selected";
+                            }
+                            if(GUILayout.Button(pair.Value, item_style)){
+                                resp(pair.Key);
+                                close_menu();
+                            }
                         }
                     });
                     
