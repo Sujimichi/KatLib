@@ -58,7 +58,7 @@ namespace KatLib
 
             if(visible){
                 GUI.skin = skin;
-                window_pos = GUI.ModalWindow(
+                window_pos = GUILayout.Window(
                     window_id, window_pos, DrawWindow, "", skin.box
                 );
                 GUI.skin = null;
