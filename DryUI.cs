@@ -157,6 +157,9 @@ namespace KatLib
         //called on each frame, handles drawing the window and will assign the next window id if it's not set
         protected virtual void OnGUI(){
             if(window_id == 0){
+                if(last_window_id == 0){
+                    last_window_id = Math.Abs(GetInstanceID());
+                }
                 window_id = last_window_id + 1;
                 last_window_id = last_window_id + 1;
             }
