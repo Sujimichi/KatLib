@@ -9,6 +9,8 @@ namespace KatLib
     public struct ClickEvent{
         public bool single_click;
         public bool double_click;
+        public bool right_click;
+        public Rect contianer;
 //        public ClickEvent(){
 //            
 //        }
@@ -67,6 +69,13 @@ namespace KatLib
         }
         protected void button(string text, GUIStyle style, float button_width, ContentNoArgs action){
             if(GUILayout.Button(text, style, width(button_width))){action();}
+        }
+
+        protected void button(Texture texture, GUIStyle style, float button_width, float button_height, ContentNoArgs action){            
+            if(GUILayout.Button(texture, style, width(button_width), height(button_height))){action();}
+        }
+        protected void button(GUIContent content, GUIStyle style, float button_width, float button_height, ContentNoArgs action){            
+            if(GUILayout.Button(content, style, width(button_width), height(button_height))){action();}
         }
 
 
@@ -134,6 +143,12 @@ namespace KatLib
             content();
             GUILayout.EndHorizontal();
         }
+        protected void section(float section_width, float section_height, Content content){
+            GUILayout.BeginHorizontal(get_section_style(), GUILayout.Width(section_width), GUILayout.MaxWidth(section_width), 
+                GUILayout.Height(section_height), GUILayout.MaxHeight(section_height)); 
+            content(section_width);
+            GUILayout.EndHorizontal();
+        }
         protected void section(float section_width, GUIStyle style, Content content){
             GUILayout.BeginHorizontal(style, GUILayout.Width(section_width), GUILayout.MaxWidth(section_width)); 
             content(section_width);
@@ -147,21 +162,39 @@ namespace KatLib
             content(section_width);
             GUILayout.EndHorizontal();
             Rect container = GUILayoutUtility.GetLastRect();
-            if(container.Contains(Event.current.mousePosition) && Event.current.type == EventType.MouseDown && Event.current.button == 0){ 
-                double elapsed_seconds = (DateTime.Now - click_tracker).TotalSeconds;
-                click_tracker = DateTime.Now;
+            handle_click_event(container, click_event);
+        }
+        protected Rect section(GUIStyle style, ContentNoArgs content, ClickEvents click_event){
+            GUILayout.BeginHorizontal(style); 
+            content();
+            GUILayout.EndHorizontal();
+            Rect container = GUILayoutUtility.GetLastRect();
+            handle_click_event(container, click_event);
+            return container;
+        }
+
+        protected void handle_click_event(Rect container, ClickEvents click_event){
+            if(container.Contains(Event.current.mousePosition) && Event.current.type == EventType.MouseDown){ 
                 ClickEvent evt = new ClickEvent();
-                if(elapsed_seconds < 0.5 && last_click_target == container){
-                    evt.double_click = true;
-                }else{
-                    evt.single_click = true;
+                evt.contianer = container;
+                if(Event.current.button == 0){
+                    double elapsed_seconds = (DateTime.Now - click_tracker).TotalSeconds;
+                    click_tracker = DateTime.Now;
+                    
+                    if(elapsed_seconds < 0.5 && last_click_target == container){
+                        evt.double_click = true;
+                    } else{
+                        evt.single_click = true;
+                    }
+                } else if(Event.current.button == 1){
+                    evt.right_click = true;
                 }
                 last_click_target = container;
                 click_event(evt);
                 Event.current.Use();
             }
+            
         }
-
 
 
         //Works in the just the same way as section() but wraps the lambda in Begin/End Vertical instead.
@@ -191,6 +224,19 @@ namespace KatLib
             );
             content(section_width);
             GUILayout.EndVertical();
+        }
+        protected void v_section(float section_width, float section_height, bool expand_height, Content content){
+            GUILayout.BeginVertical(get_section_style(), GUILayout.Width(section_width), GUILayout.MaxWidth(section_width), 
+                GUILayout.Height(section_height), GUILayout.MaxHeight(section_height), GUILayout.ExpandHeight(expand_height)
+            );
+            content(section_width);
+            GUILayout.EndVertical();
+        }
+
+        protected void area(float area_width, float area_height, Content content){
+            GUILayout.BeginArea(new Rect(0, 0, area_width, area_height));
+            content(area_width);
+            GUILayout.EndArea();
         }
 
         //Very similar to section() and v_section(), but requires a Vector2 to track scroll position and two floats for width and height as well as the content lamnbda
@@ -281,18 +327,45 @@ namespace KatLib
             dropdown(label, menu_ref, menu, parent_window, default_offset, btn_width, button_style, menu_style, menu_item_style, callback);
         }
 
-
-        protected void dropdown(string label, string menu_ref, DropdownMenuData menu, DryUI parent_window, Rect offset, float btn_width, GUIStyle button_style, GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback){
-            if(GUILayout.Button(label, button_style, width(btn_width))){
-                if(Dropdown.instance == null){
-                    gameObject.AddOrGetComponent<Dropdown>().open(anchors[menu_ref], offset, parent_window, menu, btn_width, menu_style, menu_item_style, callback);
-                } else{
-                    Dropdown.instance.close_menu();
-                }
+        protected void dropdown(Texture label, string menu_ref, DropdownMenuData menu, DryUI parent_window, float btn_width, GUIStyle button_style, GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback){
+            if(GUILayout.Button(label, button_style, width(btn_width), height(btn_width))){
+                open_dropdown(menu_ref, default_offset, parent_window, menu, btn_width, menu_style, menu_item_style, callback);
             }
             track_rect(menu_ref, GUILayoutUtility.GetLastRect(), true);            
         }
 
+        protected void dropdown(string label, string menu_ref, DropdownMenuData menu, DryUI parent_window, Rect offset, float btn_width, GUIStyle button_style, GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback){
+            if(GUILayout.Button(label, button_style, width(btn_width))){
+                open_dropdown(menu_ref, offset, parent_window, menu, btn_width, menu_style, menu_item_style, callback);
+            }
+            track_rect(menu_ref, GUILayoutUtility.GetLastRect(), true);            
+        }
+
+
+
+        protected void dropdown(string label_value, Texture texture, string menu_ref, DropdownMenuData menu, DryUI parent_window, float btn_width, MenuResponse callback){
+            dropdown(label_value, texture, menu_ref, menu, parent_window, default_offset, btn_width, "Button", "menu.background", "menu.item", callback);
+        }
+        protected void dropdown(string label_value, Texture texture, string menu_ref, DropdownMenuData menu, DryUI parent_window, Rect offset, float btn_width, GUIStyle button_style, GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback){
+            section("Button", () =>{
+                label(label_value, "button.text");
+                GUILayout.Label(texture, width(16f), height(16f));
+            }, evt =>{
+                if(evt.single_click){
+                    open_dropdown(menu_ref, offset, parent_window, menu, btn_width, menu_style, menu_item_style, callback);
+                }
+            });
+            track_rect(menu_ref, GUILayoutUtility.GetLastRect(), true);            
+        }
+
+
+        private void open_dropdown(string menu_ref, Rect offset, DryUI parent_window, DropdownMenuData menu, float btn_width, GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback){
+            if(Dropdown.instance == null){
+                gameObject.AddOrGetComponent<Dropdown>().open(anchors[menu_ref], offset, parent_window, menu, btn_width, menu_style, menu_item_style, callback);
+            } else{
+                Dropdown.instance.close_menu();
+            }
+        }
 
         protected void track_rect(string name, Rect rect, bool always_track = false){
             if(rect.x != 0 && rect.y != 0){
