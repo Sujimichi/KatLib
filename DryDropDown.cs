@@ -26,6 +26,7 @@ namespace KatLib
         public Dictionary<string, string> items = new Dictionary<string, string>();
         public List<string> selected_items = new List<string>();
         public Dictionary<string, string> special_items = new Dictionary<string, string>();
+        public bool special_items_first = true;
         public string selected_item = null;
         public DataSource remote_data = null; //remote_data enables the menu to pull it's content at the monent it is opened 
 
@@ -107,6 +108,11 @@ namespace KatLib
             style_menu = menu_style;
             style_menu_item = menu_item_style;
 
+            float h = anchor_rec.y + parent_window.window_pos.y + anchor_rec.height + anchor_offset.y;
+            if(h + scroll_height > Screen.height ){
+                scroll_height = Screen.height - h;
+            }
+
             foreach(string val in menu_content.values){
                 float w = menu_item_style.CalcSize(new GUIContent(val)).x + 15;
                 if(w > menu_width){menu_width = w;}
@@ -157,12 +163,12 @@ namespace KatLib
             GUI.skin = skin;
             GUI.depth = gui_depth;
 
-            container.x = anchor_rec.x + parent_window.window_pos.x + anchor_rec.width - menu_width;
+            container.x = anchor_rec.x + parent_window.window_pos.x + anchor_rec.width - menu_width -5;
             container.y = anchor_rec.y + parent_window.window_pos.y + anchor_rec.height - 2;
             container.x += anchor_offset.x;
             container.y += anchor_offset.y;
 
-            if(!container.Contains(Event.current.mousePosition) && Event.current.type == EventType.MouseDown && Event.current.button == 0){
+            if(!container.Contains(Event.current.mousePosition) && Event.current.type == EventType.MouseDown){
                 close_menu();
                 Event.current.Use();
             } else{
@@ -175,13 +181,8 @@ namespace KatLib
                     style_override = style_menu;
                     v_section(menu_width, w => {
                         GUILayout.Space(2);
-                        if(menu_content.special_items.Count > 0){                            
-                            foreach(KeyValuePair<string, string> pair in menu_content.special_items){
-                                if(GUILayout.Button(pair.Value, style_menu_item.name + ".special")){
-                                    resp(pair.Key);
-                                    close_menu();
-                                }
-                            }
+                        if(menu_content.special_items_first){
+                            draw_special_items();
                         }
 
                         foreach(KeyValuePair<string, string> pair in menu_content.items){
@@ -194,10 +195,24 @@ namespace KatLib
                                 close_menu();
                             }
                         }
+                        if(!menu_content.special_items_first){
+                            draw_special_items();
+                        }
                     });
                     
                 });
             });
+        }
+
+        private void draw_special_items(){
+            if(menu_content.special_items.Count > 0){
+                foreach(KeyValuePair<string, string> pair in menu_content.special_items){
+                    if(GUILayout.Button(pair.Value, style_menu_item.name + ".special")){
+                        resp(pair.Key);
+                        close_menu();
+                    }
+                }
+            }            
         }
 
     }
