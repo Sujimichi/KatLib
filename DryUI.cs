@@ -49,7 +49,7 @@ namespace KatLib
 
         //Window Config variables. Change these in Start() in descendent classes.
         public bool prevent_click_through   = true;     //prevent clicks interacting with elements behind the window
-        protected bool require_login        = false;    //set to true if the window requires user to be logged into KerbalX
+        public bool require_login           = false;    //set to true if the window requires user to be logged into KerbalX
         public bool draggable               = true;     //sets the window as draggable
         public bool footer                  = true;     //sets if the set footer content should be draw (see FooterContent method)
         public bool visible                 = true;     //sets if the window is visible to start with (see show(), hide(), toggle(), on_show(), on_hide())
@@ -128,6 +128,13 @@ namespace KatLib
             return dialog;
         }
 
+        protected ModalDialog show_modal_dialog(DialogContent content){
+            ModalDialog dialog = gameObject.AddOrGetComponent<ModalDialog>();
+            dialog.content = content;
+            dialog.skin = this.skin;
+            return dialog;
+        }
+
         //close instance of dialog if it exists.
         protected void close_dialog(){
             DryDialog.close();      
@@ -154,6 +161,8 @@ namespace KatLib
 
         //MonoBehaviour methods
 
+        protected GUIStyle window_style = "window";
+        protected GUIStyle alt_window_style = null;
         //called on each frame, handles drawing the window and will assign the next window id if it's not set
         protected virtual void OnGUI(){
             if(window_id == 0){
@@ -163,13 +172,24 @@ namespace KatLib
                 window_id = last_window_id + 1;
                 last_window_id = last_window_id + 1;
             }
+            if(alt_window_style != null){
+                window_style = alt_window_style;
+            } else{
+                window_style = skin.window;
+            }
+
 
             if(visible){
 //                GUI.skin = skin;
+//                window_pos = GUILayout.Window(
+//                    window_id, window_pos, DrawWindow, window_title,
+//                    GUILayout.Width(window_pos.width), GUILayout.MaxWidth(window_pos.width), GUILayout.ExpandHeight(true)
+//                );
                 window_pos = GUILayout.Window(
-                    window_id, window_pos, DrawWindow, window_title,
+                    window_id, window_pos, DrawWindow, window_title, window_style,
                     GUILayout.Width(window_pos.width), GUILayout.MaxWidth(window_pos.width), GUILayout.ExpandHeight(true)
                 );
+                  
 //                GUI.skin = null;
             }
         }

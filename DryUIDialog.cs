@@ -45,10 +45,20 @@ namespace KatLib
     public class ModalDialog : DryDialog
     {
 
+        new public static ModalDialog instance = null;
+
         new public Rect window_pos = new Rect(0, 0, Screen.width, Screen.height);
 
         public Rect dialog_pos = new Rect(0,0,500,80);
         public Rect title_pos = new Rect();
+
+
+        private void Start() {
+            ModalDialog.instance = this;
+            footer = false;
+            is_dialog = true;
+            draggable = false;
+        }
 
         protected override void OnGUI(){
             if(window_id == 0){
@@ -80,6 +90,11 @@ namespace KatLib
             });
         }
 
+        new public static void close() {
+            if(ModalDialog.instance){
+                GameObject.Destroy(ModalDialog.instance);
+            }
+        }
     }
 
 }
