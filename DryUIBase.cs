@@ -157,6 +157,11 @@ namespace KatLib
             content(section_width);
             GUILayout.EndHorizontal();
         }
+        protected void section(GUIStyle style, ContentNoArgs content){
+            GUILayout.BeginHorizontal(style);
+            content();
+            GUILayout.EndHorizontal();
+        }
         protected void section(float section_width, float section_height, GUIStyle style, Content content){
             GUILayout.BeginHorizontal(style, GUILayout.Width(section_width), GUILayout.MaxWidth(section_width), 
                 GUILayout.Height(section_height), GUILayout.MaxHeight(section_height)); 
@@ -182,8 +187,16 @@ namespace KatLib
             return container;
         }
 
+
         protected void v_section(float section_width, Content content, ClickEvents click_event){
             GUILayout.BeginVertical(get_section_style(), GUILayout.Width(section_width), GUILayout.MaxWidth(section_width)); 
+            content(section_width);
+            GUILayout.EndVertical();
+            Rect container = GUILayoutUtility.GetLastRect();
+            handle_click_event(container, click_event);
+        }
+        protected void v_section(float section_width, float section_height, GUIStyle style, Content content, ClickEvents click_event){
+            GUILayout.BeginVertical(style, GUILayout.Width(section_width), GUILayout.MaxWidth(section_width), GUILayout.Height(section_height), GUILayout.MaxHeight(section_height)); 
             content(section_width);
             GUILayout.EndVertical();
             Rect container = GUILayoutUtility.GetLastRect();
@@ -234,6 +247,11 @@ namespace KatLib
         protected void v_section(float section_width, GUIStyle style, Content content){
             GUILayout.BeginVertical(style, GUILayout.Width(section_width), GUILayout.MaxWidth(section_width));
             content(section_width);
+            GUILayout.EndVertical();
+        }
+        protected void v_section(GUIStyle style, ContentNoArgs content){
+            GUILayout.BeginVertical(style);
+            content();
             GUILayout.EndVertical();
         }
         protected void v_section(float section_width, float section_height, Content content){

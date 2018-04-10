@@ -60,7 +60,7 @@ namespace KatLib
         //public Rect window_pos            = new Rect()            //override in Start() to set window size/pos - default values are defined in DryUIBase
 //        public int gui_depth                = 0;
 
-        protected bool interface_locked       = false; //not to be confused with gui_locked. interface_lock is set to true when ControlLocks are set on the KSP interface
+        protected bool interface_locked     = false; //not to be confused with gui_locked. interface_lock is set to true when ControlLocks are set on the KSP interface
         protected bool is_dialog            = false; //set to true in dialog windows.
 
 
@@ -138,6 +138,7 @@ namespace KatLib
         //close instance of dialog if it exists.
         protected void close_dialog(){
             DryDialog.close();      
+            ModalDialog.close();
         }
 
 
