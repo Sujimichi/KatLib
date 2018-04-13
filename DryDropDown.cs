@@ -9,6 +9,16 @@ namespace KatLib
     public delegate void MenuResponse(string selected);
     public delegate List<string> DataSource();
 
+    public struct DropDownAttributes{        
+        public Rect anchor;
+        public Rect offset;
+        public DryUI parent_window;
+        public float btn_width;
+        public GUIStyle menu_style;
+        public GUIStyle menu_item_style;
+        public MenuResponse callback;
+
+    }
 
     public class DropdownMenuData
     {
@@ -29,6 +39,8 @@ namespace KatLib
         public bool special_items_first = true;
         public string selected_item = null;
         public DataSource remote_data = null; //remote_data enables the menu to pull it's content at the monent it is opened 
+        public DropDownAttributes attrs = new DropDownAttributes();
+
 
         public void set_data(List<string> data){
             items.Clear();
@@ -66,6 +78,16 @@ namespace KatLib
         }
 
 
+        public void set_attributes(Rect anchor, Rect offset, DryUI parent_window, float btn_width, GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback){
+            attrs.anchor = anchor;
+            attrs.offset = offset;
+            attrs.parent_window = parent_window;
+            attrs.btn_width = btn_width;
+            attrs.menu_style = menu_style;
+            attrs.menu_item_style = menu_item_style;
+            attrs.callback = callback;
+        }
+
     }
 
     public class Dropdown : DryUIBase
@@ -94,19 +116,18 @@ namespace KatLib
         public float scroll_width;
 
 
-        public void open(Rect anchor, Rect offset, DryUI window, DropdownMenuData menu_data, float width, 
-            GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback
-        ){
-            anchor_rec = anchor;
-            anchor_offset = offset;
-            parent_window = window;
+        public void open(DropdownMenuData menu_data){
+            
+            anchor_rec = menu_data.attrs.anchor;
+            anchor_offset = menu_data.attrs.offset;
+            parent_window = menu_data.attrs.parent_window;
             skin = parent_window.skin;
 
             menu_content = (DropdownMenuData)menu_data;
             menu_content.fetch_data();
 
-            style_menu = menu_style;
-            style_menu_item = menu_item_style;
+            style_menu = menu_data.attrs.menu_style;
+            style_menu_item = menu_data.attrs.menu_item_style;
 
             float h = anchor_rec.y + parent_window.window_pos.y + anchor_rec.height + anchor_offset.y;
             if(h + scroll_height > Screen.height ){
@@ -114,7 +135,7 @@ namespace KatLib
             }
 
             foreach(string val in menu_content.values){
-                float w = menu_item_style.CalcSize(new GUIContent(val)).x + 15;
+                float w = menu_data.attrs.menu_item_style.CalcSize(new GUIContent(val)).x + 15;
                 if(w > menu_width){menu_width = w;}
             }
 
@@ -127,7 +148,7 @@ namespace KatLib
             }
 
             foreach(string val in vals){
-                val_size = menu_item_style.CalcSize(new GUIContent(val));
+                val_size = menu_data.attrs.menu_item_style.CalcSize(new GUIContent(val));
                 float w = val_size.x + 15;
                 container.height += val_size.y + 4;
                 if(w > menu_width){menu_width = w;}
@@ -141,7 +162,7 @@ namespace KatLib
             }
 
 
-            resp = callback;
+            resp = menu_data.attrs.callback;
         }
 
         void Start(){

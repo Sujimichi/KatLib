@@ -370,41 +370,55 @@ namespace KatLib
             dropdown(label, menu_ref, menu, parent_window, default_offset, btn_width, button_style, menu_style, menu_item_style, callback);
         }
 
-        protected void dropdown(Texture label, string menu_ref, DropdownMenuData menu, DryUI parent_window, float btn_width, GUIStyle button_style, GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback){
-            if(GUILayout.Button(label, button_style, width(btn_width), height(btn_width))){
-                open_dropdown(menu_ref, default_offset, parent_window, menu, btn_width, menu_style, menu_item_style, callback);
-            }
-            track_rect(menu_ref, GUILayoutUtility.GetLastRect(), true);            
-        }
-
-        protected void dropdown(string label, string menu_ref, DropdownMenuData menu, DryUI parent_window, Rect offset, float btn_width, GUIStyle button_style, GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback){
-            if(GUILayout.Button(label, button_style, width(btn_width))){
-                open_dropdown(menu_ref, offset, parent_window, menu, btn_width, menu_style, menu_item_style, callback);
-            }
-            track_rect(menu_ref, GUILayoutUtility.GetLastRect(), true);            
-        }
-
-
-
         protected void dropdown(string label_value, Texture texture, string menu_ref, DropdownMenuData menu, DryUI parent_window, float btn_width, MenuResponse callback){
             dropdown(label_value, texture, menu_ref, menu, parent_window, default_offset, btn_width, "Button", "menu.background", "menu.item", callback);
         }
+        protected void dropdown(string label_value, Texture texture, string menu_ref, DropdownMenuData menu, DryUI parent_window, Rect offset, float btn_width, MenuResponse callback){
+            dropdown(label_value, texture, menu_ref, menu, parent_window, offset, btn_width, "Button", "menu.background", "menu.item", callback);
+        }
+
+
+        protected void dropdown(Texture label, string menu_ref, DropdownMenuData menu, DryUI parent_window, float btn_width, GUIStyle button_style, GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback){
+            if(anchors.ContainsKey(menu_ref)){
+                menu.set_attributes(anchors[menu_ref], default_offset, parent_window, btn_width, menu_style, menu_item_style, callback);
+            }
+
+            if(GUILayout.Button(label, button_style, width(btn_width), height(btn_width))){
+                open_dropdown(menu);
+            }
+            track_rect(menu_ref, GUILayoutUtility.GetLastRect(), true);            
+        }
+        protected void dropdown(string label, string menu_ref, DropdownMenuData menu, DryUI parent_window, Rect offset, float btn_width, GUIStyle button_style, GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback){
+            if(anchors.ContainsKey(menu_ref)){
+                menu.set_attributes(anchors[menu_ref], offset, parent_window, btn_width, menu_style, menu_item_style, callback);
+            }
+
+            if(GUILayout.Button(label, button_style, width(btn_width))){
+                open_dropdown(menu);
+            }
+            track_rect(menu_ref, GUILayoutUtility.GetLastRect(), true);            
+        }
+
         protected void dropdown(string label_value, Texture texture, string menu_ref, DropdownMenuData menu, DryUI parent_window, Rect offset, float btn_width, GUIStyle button_style, GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback){
+            if(anchors.ContainsKey(menu_ref)){
+                menu.set_attributes(anchors[menu_ref], offset, parent_window, btn_width, menu_style, menu_item_style, callback);
+            }
+
             section("Button", () =>{
                 label(label_value, "button.text");
                 GUILayout.Label(texture, width(16f), height(16f));
             }, evt =>{
                 if(evt.single_click){
-                    open_dropdown(menu_ref, offset, parent_window, menu, btn_width, menu_style, menu_item_style, callback);
+                    open_dropdown(menu);
                 }
             });
             track_rect(menu_ref, GUILayoutUtility.GetLastRect(), true);            
         }
 
 
-        private void open_dropdown(string menu_ref, Rect offset, DryUI parent_window, DropdownMenuData menu, float btn_width, GUIStyle menu_style, GUIStyle menu_item_style, MenuResponse callback){
+        protected void open_dropdown(DropdownMenuData menu){
             if(Dropdown.instance == null){
-                gameObject.AddOrGetComponent<Dropdown>().open(anchors[menu_ref], offset, parent_window, menu, btn_width, menu_style, menu_item_style, callback);
+                gameObject.AddOrGetComponent<Dropdown>().open(menu);
             } else{
                 Dropdown.instance.close_menu();
             }
