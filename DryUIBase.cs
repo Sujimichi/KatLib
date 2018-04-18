@@ -73,7 +73,10 @@ namespace KatLib
         protected void button(string text, GUIStyle style, float button_width, ContentNoArgs action){
             if(GUILayout.Button(text, style, width(button_width))){action();}
         }
+        protected void button(string text, GUIStyle style, float button_width, float max_width, ContentNoArgs action){
+            if(GUILayout.Button(text, style, GUILayout.Width(button_width), GUILayout.MaxWidth(max_width), GUILayout.ExpandWidth(true) )){action();}
 
+        }
         protected void button(Texture texture, GUIStyle style, float button_width, float button_height, ContentNoArgs action){            
             if(GUILayout.Button(texture, style, width(button_width), height(button_height))){action();}
         }

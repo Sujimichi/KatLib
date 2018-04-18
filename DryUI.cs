@@ -68,6 +68,7 @@ namespace KatLib
         //show, hide and toggle - basically just change the value of the bool visible which defines whether or not OnGUI will draw the window.
         //also provides hooks (on_show and on_hide) for decendent classes to trigger actions when showing or hiding.
         public void show(){
+            before_show();
             visible = true;
             on_show();
         }
@@ -96,8 +97,9 @@ namespace KatLib
         }
 
         //overridable methods for gui classes to define actions which are called on hide and show
-        protected virtual void on_hide(){}
+        protected virtual void before_show(){}
         protected virtual void on_show(){}
+        protected virtual void on_hide(){}
         protected virtual void on_error(){}
 
         //lock_iu and unlock_ui result in GUI.enabled being set around the call to draw the contents of the window.
@@ -146,15 +148,17 @@ namespace KatLib
         protected void prevent_ui_click_through(){
             Vector2 mouse_pos = Input.mousePosition;
             mouse_pos.y = Screen.height - mouse_pos.y;
-            if(window_pos.Contains(mouse_pos)){
-                if(!interface_locked){
-                    InputLockManager.SetControlLock(window_id.ToString());
-                    interface_locked = true;
-                }
-            } else{
-                if(interface_locked){
-                    InputLockManager.RemoveControlLock(window_id.ToString());
-                    interface_locked = false;
+            if(window_id != 0){
+                if(window_pos.Contains(mouse_pos)){
+                    if(!interface_locked){
+                        InputLockManager.SetControlLock(window_id.ToString());
+                        interface_locked = true;
+                    }
+                } else{
+                    if(interface_locked){
+                        InputLockManager.RemoveControlLock(window_id.ToString());
+                        interface_locked = false;
+                    }
                 }
             }
         }
