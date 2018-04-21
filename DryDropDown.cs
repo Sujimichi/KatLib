@@ -40,6 +40,7 @@ namespace KatLib
         public string selected_item = null;
         public DataSource remote_data = null; //remote_data enables the menu to pull it's content at the monent it is opened 
         public DropDownAttributes attrs = new DropDownAttributes();
+        public bool offset_menu = true;
 
 
         public void set_data(List<string> data){
@@ -114,10 +115,10 @@ namespace KatLib
         public Vector2 scroll_pos = new Vector2();
         public float scroll_height = 350f;
         public float scroll_width;
-
+        public DropdownMenuData menu;
 
         public void open(DropdownMenuData menu_data){
-            
+            menu = menu_data;
             anchor_rec = menu_data.attrs.anchor;
             anchor_offset = menu_data.attrs.offset;
             parent_window = menu_data.attrs.parent_window;
@@ -184,7 +185,10 @@ namespace KatLib
             GUI.skin = skin;
             GUI.depth = gui_depth;
 
-            container.x = anchor_rec.x + parent_window.window_pos.x + anchor_rec.width - menu_width -5;
+            container.x = anchor_rec.x + parent_window.window_pos.x + anchor_rec.width - 5;
+            if(menu.offset_menu){
+                container.x -= menu_width;
+            }
             container.y = anchor_rec.y + parent_window.window_pos.y + anchor_rec.height - 2;
             container.x += anchor_offset.x;
             container.y += anchor_offset.y;
