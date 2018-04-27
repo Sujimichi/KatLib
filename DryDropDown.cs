@@ -7,7 +7,7 @@ using UnityEngine;
 namespace KatLib
 {
     public delegate void MenuResponse(string selected);
-    public delegate List<string> DataSource();
+    public delegate void DataSource(DropdownMenuData menu);
 
     public struct DropDownAttributes{        
         public Rect anchor;
@@ -57,7 +57,8 @@ namespace KatLib
 
         public void fetch_data(){
             if(remote_data != null){
-                set_data(remote_data());
+                remote_data(this);
+//                set_data(remote_data());
             }
         }
 
