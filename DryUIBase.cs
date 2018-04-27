@@ -87,7 +87,7 @@ namespace KatLib
 
 
         protected string humanize(float val){
-            return String.Format("{0:n}", Math.Round(val, 2));
+            return String.Format("{0:n}", Math.Round(val, 2)).Replace("_", " ");
         }
 
 
