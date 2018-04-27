@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using ExtensionMethods;
 //using UnityEngine;
 
@@ -44,7 +45,25 @@ namespace ExtensionMethods
             {
                 return "on " + date.ToString("yyyy/MM/dd");
             }
-        }    
+        }
+
+
+
+        //List<string> foo = new List<string> { "foo", "bar", "lar" };
+        //foo.n_join("and") => "foo, bar and lar"
+        public static string n_join(this List<string> arr, string joiner){            
+            string s = "";
+            if(arr.Count <= 1){
+                s = String.Join(", ", arr.ToArray());
+            } else{
+                s = arr[0];
+                for(int i = 1; i < arr.Count - 1; i++){
+                    s += ", " + arr[i];
+                }
+                s += " " + joiner + " " + arr[arr.Count - 1];
+            }
+            return s;
+        }
     }
 }
 
@@ -52,7 +71,7 @@ namespace KatLib
 {
     public class Checksum
     {
-
+        
         public static bool compare(string str1, string str2){
             return digest(str1) == digest(str2);           
         }
