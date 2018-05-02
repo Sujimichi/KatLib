@@ -9,7 +9,7 @@ namespace KatLib
     public delegate void MenuResponse(string selected);
     public delegate void DataSource(DropdownMenuData menu);
 
-    public struct DropDownAttributes{        
+ public struct DropDownAttributes{        
         public Rect anchor;
         public Rect offset;
         public DryUI parent_window;
@@ -42,6 +42,8 @@ namespace KatLib
         public DropDownAttributes attrs = new DropDownAttributes();
         public bool offset_menu = true;
 
+        public Callback on_menu_open;
+        public Callback on_menu_close;
 
         public void set_data(List<string> data){
             items.Clear();
@@ -163,6 +165,9 @@ namespace KatLib
                 container.width += 22;
             }
 
+            if(menu.on_menu_open != null){
+                menu.on_menu_open();
+            }
 
             resp = menu_data.attrs.callback;
         }
@@ -179,6 +184,9 @@ namespace KatLib
 
         public void close_menu(){
             parent_window.unlock_ui();
+            if(menu.on_menu_close != null){
+                menu.on_menu_close();
+            }
             GameObject.Destroy(Dropdown.instance);
         }
 
