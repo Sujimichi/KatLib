@@ -60,6 +60,12 @@ namespace KatLib
         protected void label(Texture texture, float label_width, float label_height){
             GUILayout.Label(texture, width(label_width), height(label_height));
         }
+        protected void label(Texture texture, GUIStyle style, float label_width, float label_height){
+            GUILayout.Label(texture, style, width(label_width), height(label_height));
+        }
+        protected void label(Texture texture, GUIStyle style){
+            GUILayout.Label(texture, style);
+        }
 
         protected void button(string text, ContentNoArgs action){
             if(GUILayout.Button(text)){action();}
