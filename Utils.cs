@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Security.Cryptography;
 using ExtensionMethods;
 //using UnityEngine;
 
@@ -67,6 +68,8 @@ namespace ExtensionMethods
     }
 }
 
+
+
 namespace KatLib
 {
     public class Checksum
@@ -86,6 +89,17 @@ namespace KatLib
                 return BitConverter.ToString(hash).Replace("-", String.Empty);
             }
         }
+
+        public static string digest_file(string path){
+            
+            using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 16*1024*1024))
+            {
+                SHA256Managed sha = new SHA256Managed();
+                byte[] checksum = sha.ComputeHash(stream);
+                return BitConverter.ToString(checksum).Replace("-", String.Empty);
+            }
+        }
+
     }
 
 
