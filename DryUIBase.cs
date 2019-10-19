@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-//Built against KSP 1.4.3
+//Built against KSP 1.8.0
 
 namespace KatLib
 {

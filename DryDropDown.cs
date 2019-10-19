@@ -9,7 +9,7 @@ namespace KatLib
     public delegate void MenuResponse(string selected);
     public delegate void DataSource(DropdownMenuData menu);
 
- public struct DropDownAttributes{        
+    public struct DropDownAttributes{        
         public Rect anchor;
         public Rect offset;
         public DryUI parent_window;
